@@ -3,7 +3,8 @@ package com.example.peter.bluetoothlowenergy.BTLE;
 import android.bluetooth.*;
 import android.content.Context;
 import android.util.Log;
-import com.example.peter.bluetoothlowenergy.BTLE.Service.RcvService;
+
+import com.example.peter.bluetoothlowenergy.BTLE.Service.TestService;
 import com.example.peter.bluetoothlowenergy.R;
 
 import java.util.UUID;
@@ -13,12 +14,14 @@ import java.util.UUID;
  */
 public class Server {
 
-    private static BluetoothGattServer server;
+    private BluetoothGattServer server;
+    private Context context;
 
     public Server(Context context, BluetoothManager btManager) {
         server = btManager.openGattServer(context, callback);
+        this.context = context;
         server.addService(
-          new RcvService(
+          new TestService(
                   UUID.fromString(context.getString(R.string.btmesh_uuid)),
                   BluetoothGattService.SERVICE_TYPE_PRIMARY,
                   context
@@ -26,7 +29,7 @@ public class Server {
         );
     }
 
-    private static BluetoothGattServerCallback callback = new BluetoothGattServerCallback() {
+    private BluetoothGattServerCallback callback = new BluetoothGattServerCallback() {
         private String TAG = "Server";
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
@@ -42,19 +45,21 @@ public class Server {
         @Override
         public void onCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic);
+            server.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, characteristic.getValue());
         }
 
         @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value);
-            server.sendResponse(device, requestId, 0, 0, value);
+            characteristic.setValue(value);
+            server.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
             Log.d(TAG, new String(value));
-            Log.d(TAG, "Ende");
         }
 
         @Override
         public void onDescriptorReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattDescriptor descriptor) {
             super.onDescriptorReadRequest(device, requestId, offset, descriptor);
+            server.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, descriptor.getValue());
         }
 
         @Override

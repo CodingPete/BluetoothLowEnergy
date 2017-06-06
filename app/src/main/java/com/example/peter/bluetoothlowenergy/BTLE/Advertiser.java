@@ -24,6 +24,8 @@ public class Advertiser {
 
         ParcelUuid puuid = new ParcelUuid(UUID.fromString(context.getString(R.string.btmesh_uuid)));
 
+        btAdapter.setName("BTLE");
+
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
                 .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
                 .setConnectable(true)
@@ -31,9 +33,8 @@ public class Advertiser {
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW)
                 .build();
         AdvertiseData data = new AdvertiseData.Builder()
-                .setIncludeDeviceName(false)
+                .setIncludeDeviceName(true)
                 .addServiceUuid(puuid)
-                .addServiceData(puuid, "data".getBytes(Charset.forName("UTF-8")))
                 .build();
         btAdvertiser.startAdvertising(
                 settings,

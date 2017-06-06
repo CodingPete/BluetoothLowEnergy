@@ -3,5 +3,7 @@
     <string name="ble_not_supported">Bluetooth Low Energy is not supported on this device</string>
     <string name="ble_supported">Bluetooth Low Energy is supported on this device</string>
     <string name="btmesh_uuid">a3990e6b-cc03-4119-9e1d-2d2e8d3d6041</string>
-    <string name="btmesh_rcv_characteristic">a3990e6b-cc03-4119-9e1d-2d2e8d3d6042</string>
+    <string name="btmesh_writeonly_characteristic">a3990e6b-cc03-4119-9e1d-2d2e8d3d6042</string>
+    <string name="btmesh_readonly_characteristic">a3990e6b-cc03-4119-9e1d-2d2e8d3d6044</string>
+    <string name="btmesh_readwrite_characteristic">a3990e6b-cc03-4119-9e1d-2d2e8d3d6046</string>
 </resources>
