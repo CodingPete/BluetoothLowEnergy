@@ -26,6 +26,6 @@ public class ReadCharacteristic extends BluetoothGattCharacteristic {
         );
         descriptor.setValue("ReadCharacteristic".getBytes());
         this.addDescriptor(descriptor);
-        this.setValue(42, FORMAT_UINT16, 0);
+        this.setValue(42, FORMAT_SINT8, 0);
     }
 }

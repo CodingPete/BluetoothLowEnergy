@@ -14,12 +14,10 @@ import java.util.UUID;
  */
 public class Server {
 
-    private BluetoothGattServer server;
-    private Context context;
+    private static BluetoothGattServer server;
 
     public Server(Context context, BluetoothManager btManager) {
         server = btManager.openGattServer(context, callback);
-        this.context = context;
         server.addService(
           new TestService(
                   UUID.fromString(context.getString(R.string.btmesh_uuid)),
@@ -27,9 +25,25 @@ public class Server {
                   context
           )
         );
+
+        // Jetzt wird ein minimaler Battery-Service entsprechend der Bluetooth Spezifikation hinzugefügt.
+        // Base-UUID : 	00000000-0000-1000-8000-00805F9B34FB
+        // UUID berechnen : Assigned Number * 2^96 + Base-UUID
+        // 16 Bit Assigned Number : 0000xxxx-0000-1000-8000-00805F9B34FB
+        // 32 Bit Assigned Number : xxxx0000-0000-1000-8000-00805F9B34FB
+
+        // 4 Digits hinzufügen um Batteryservice UUID zu bekommen 0x180F 16bit lang
+        // BatteryService-UUID : 	0000180F-0000-1000-8000-00805F9B34FB
+        BluetoothGattService batteryService = new BluetoothGattService(UUID.fromString("0000180F-0000-1000-8000-00805F9B34FB"), BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        // Batterylevel Characteristic hinzufügen Assigned Number: 0x2A19
+        BluetoothGattCharacteristic batteryCharacteristic = new BluetoothGattCharacteristic(UUID.fromString("00002A19-0000-1000-8000-00805F9B34FB"), BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ);
+        batteryCharacteristic.setValue(45, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        batteryService.addCharacteristic(batteryCharacteristic);
+        server.addService(batteryService);
     }
 
-    private BluetoothGattServerCallback callback = new BluetoothGattServerCallback() {
+    private static BluetoothGattServerCallback callback = new BluetoothGattServerCallback() {
         private String TAG = "Server";
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
