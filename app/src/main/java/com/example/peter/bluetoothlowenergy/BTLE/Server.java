@@ -65,8 +65,16 @@ public class Server {
         @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value);
-            characteristic.setValue(value);
-            server.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
+
+            if(device.getBondState() == BluetoothDevice.BOND_NONE) {
+                device.createBond();
+                server.sendResponse(device, requestId, BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION, offset, value);
+            }
+            else {
+                characteristic.setValue(value);
+                server.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
+            }
+
             Log.d(TAG, new String(value));
         }
 
